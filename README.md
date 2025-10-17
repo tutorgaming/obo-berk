@@ -50,7 +50,7 @@ docker-compose up -d
 
 # Access the application
 # Frontend: http://localhost
-# Backend API: http://localhost:5000/api
+# Backend API: http://localhost:3001/api
 ```
 
 **Development Mode with Hot Reload:**
@@ -62,7 +62,7 @@ docker-compose -f docker-compose.dev.yml up
 # Access at http://localhost:5173
 ```
 
-📚 **For detailed Docker instructions, see [DOCKER.md](DOCKER.md)**
+📚 **For detailed Docker instructions, see [docs/DOCKER.md](docs/DOCKER.md)**
 
 ### Option 2: Manual Installation
 
@@ -92,7 +92,7 @@ docker-compose -f docker-compose.dev.yml up
 Create a `.env` file in the `backend` directory:
 
 ```env
-PORT=5000
+PORT=5001
 MONGODB_URI=mongodb://localhost:27017/obo-berk
 UPLOAD_DIR=uploads
 ```
@@ -139,25 +139,39 @@ The application will be available at `http://localhost:5173`
 ### Export
 - `GET /api/export/project/:projectId/pdf` - Export project expenses as PDF
 
+## 📚 Documentation
+
+All detailed documentation has been moved to the [`docs/`](docs/) directory:
+
+- **[Quick Start Guide](docs/QUICKSTART.md)** - Get running in 5 minutes
+- **[Docker Guide](docs/DOCKER.md)** - Container deployment
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Production setup
+- **[Testing Guide](docs/TESTING.md)** - Test procedures
+- **[Feature Documentation](docs/)** - Complete feature list
+
+See **[docs/README.md](docs/README.md)** for the full documentation index.
+
 ## Project Structure
 
 ```
 obo-berk/
-├── backend/
-│   ├── models/          # Mongoose schemas
-│   ├── routes/          # API routes
-│   ├── uploads/         # Uploaded receipt files
-│   ├── server.js        # Main server file
-│   └── package.json
-├── frontend/
+├── backend/           # Node.js + Express API
+│   ├── models/        # MongoDB schemas
+│   ├── routes/        # API endpoints
+│   ├── uploads/       # Receipt uploads
+│   └── server.js      # Main server
+├── frontend/          # React + Vite app
 │   ├── src/
-│   │   ├── components/  # React components
-│   │   ├── services/    # API services
-│   │   ├── App.jsx      # Main app component
-│   │   └── main.jsx     # Entry point
-│   ├── index.html
+│   │   ├── components/
+│   │   └── services/
 │   └── package.json
-└── README.md
+├── docs/              # 📚 All documentation
+│   ├── README.md      # Documentation index
+│   ├── QUICKSTART.md
+│   ├── DOCKER.md
+│   └── ...
+├── docker-compose.yml
+└── README.md          # This file
 ```
 
 ## License

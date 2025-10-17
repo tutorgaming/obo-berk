@@ -55,7 +55,7 @@ docker-compose down
 
 Access the application at:
 - Frontend: http://localhost
-- Backend API: http://localhost:5000/api
+- Backend API: http://localhost:3001/api
 
 ## 💻 Development Mode (with hot reload)
 
@@ -96,7 +96,7 @@ npm install
 npm run dev
 ```
 
-Backend will run on http://localhost:5000
+Backend will run on http://localhost:5001
 
 ### 3. Install and Start Frontend
 
@@ -190,11 +190,11 @@ npm run dev
 ```bash
 # Check what's using the port
 # Linux/Mac:
-lsof -i :5000
+lsof -i :5001
 lsof -i :80
 
 # Windows:
-netstat -ano | findstr :5000
+netstat -ano | findstr :5001
 netstat -ano | findstr :80
 
 # Then stop that service or change ports in docker-compose.yml
@@ -221,7 +221,7 @@ docker-compose up -d
 - Check `backend/.env` has correct `MONGODB_URI`
 - Default: `mongodb://localhost:27017/obo-berk`
 
-**Port 5000 already in use:**
+**Port 5001 already in use:**
 - Change `PORT` in `backend/.env`
 - Update `VITE_API_URL` in `frontend/.env`
 

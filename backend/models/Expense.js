@@ -3,7 +3,17 @@ const mongoose = require('mongoose');
 const expenseSchema = new mongoose.Schema({
   name: {
     type: String,
+    required: false,
+    trim: true
+  },
+  shop_name: {
+    type: String,
     required: true,
+    trim: true
+  },
+  detail: {
+    type: String,
+    required: false,
     trim: true
   },
   projectId: {

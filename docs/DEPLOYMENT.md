@@ -47,7 +47,7 @@ nano backend/.env
 
 # Set production values:
 # MONGODB_URI=mongodb://mongodb:27017/obo-berk
-# PORT=5000
+# PORT=5001
 ```
 
 6. **Start the application**
@@ -77,7 +77,7 @@ server {
     }
 
     location /api {
-        proxy_pass http://localhost:5000;
+        proxy_pass http://localhost:3001;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -86,7 +86,7 @@ server {
     }
 
     location /uploads {
-        proxy_pass http://localhost:5000;
+        proxy_pass http://localhost:3001;
     }
 }
 ```
@@ -313,7 +313,7 @@ find /backups -mtime +30 -delete
 
 For production issues:
 1. Check logs: `docker-compose logs -f`
-2. Verify health: `curl http://localhost:5000/api/health`
+2. Verify health: `curl http://localhost:3001/api/health`
 3. Review DOCKER.md for common issues
 4. Check GitHub issues
 
@@ -322,7 +322,7 @@ For production issues:
 ### Backend (.env)
 ```env
 NODE_ENV=production
-PORT=5000
+PORT=5001
 MONGODB_URI=mongodb://mongodb:27017/obo-berk
 UPLOAD_DIR=uploads
 ```

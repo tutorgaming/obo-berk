@@ -5,10 +5,10 @@ Use this checklist to verify all features are working correctly.
 ## ✅ Pre-Testing Setup
 
 - [ ] Docker is installed and running
-- [ ] Ports 80, 5000, and 27017 are available
+- [ ] Ports 80, 3001, and 27017 are available
 - [ ] Run `docker-compose up -d` successfully
 - [ ] Frontend accessible at http://localhost
-- [ ] Backend API accessible at http://localhost:5000/api/health
+- [ ] Backend API accessible at http://localhost:3001/api/health
 
 ## 👤 User Management Tests
 
@@ -287,19 +287,19 @@ Use this checklist to verify all features are working correctly.
 ## 📊 API Tests
 
 ### Health Check
-- [ ] Visit http://localhost:5000/api/health
+- [ ] Visit http://localhost:3001/api/health
 - [ ] Returns { "status": "OK" }
 
 ### Users Endpoint
-- [ ] GET http://localhost:5000/api/users
+- [ ] GET http://localhost:3001/api/users
 - [ ] Returns array of users
 
 ### Projects Endpoint
-- [ ] GET http://localhost:5000/api/projects
+- [ ] GET http://localhost:3001/api/projects
 - [ ] Returns array of projects
 
 ### Expenses Endpoint
-- [ ] GET http://localhost:5000/api/expenses/project/{projectId}
+- [ ] GET http://localhost:3001/api/expenses/project/{projectId}
 - [ ] Returns expenses for project
 
 ## 📝 Documentation Tests

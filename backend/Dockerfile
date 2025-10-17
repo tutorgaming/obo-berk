@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm install --only=production
 
 # Copy application files
 COPY . .
@@ -18,7 +18,7 @@ RUN mkdir -p uploads
 RUN mkdir -p fonts
 
 # Expose port
-EXPOSE 5000
+EXPOSE 5001
 
 # Start the application
 CMD ["node", "server.js"]

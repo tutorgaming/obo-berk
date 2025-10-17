@@ -7,6 +7,7 @@ router.get('/', async (req, res) => {
   try {
     const projects = await Project.find()
       .populate('userId', 'name email')
+      .populate('supervisorId', 'name email')
       .sort({ createdAt: -1 });
     res.json(projects);
   } catch (error) {
@@ -19,6 +20,7 @@ router.get('/user/:userId', async (req, res) => {
   try {
     const projects = await Project.find({ userId: req.params.userId })
       .populate('userId', 'name email')
+      .populate('supervisorId', 'name email')
       .sort({ createdAt: -1 });
     res.json(projects);
   } catch (error) {
@@ -30,7 +32,8 @@ router.get('/user/:userId', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const project = await Project.findById(req.params.id)
-      .populate('userId', 'name email department');
+      .populate('userId', 'name email department')
+      .populate('supervisorId', 'name email department');
 
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
@@ -45,18 +48,20 @@ router.get('/:id', async (req, res) => {
 // Create new project
 router.post('/', async (req, res) => {
   try {
-    const { name, description, userId, budget, status } = req.body;
+    const { name, description, userId, budget, status, supervisorId } = req.body;
 
     const project = new Project({
       name,
       description,
       userId,
+      supervisorId,
       budget,
       status: status || 'active'
     });
 
     await project.save();
     await project.populate('userId', 'name email');
+    await project.populate('supervisorId', 'name email');
 
     res.status(201).json(project);
   } catch (error) {
@@ -67,13 +72,22 @@ router.post('/', async (req, res) => {
 // Update project
 router.put('/:id', async (req, res) => {
   try {
-    const { name, description, budget, status } = req.body;
+    const { name, description, budget, status, supervisorId } = req.body;
+
+    const updateData = { name, description, budget, status };
+
+    // Handle supervisorId - allow null/undefined to clear it
+    if (supervisorId !== undefined) {
+      updateData.supervisorId = supervisorId || null;
+    }
 
     const project = await Project.findByIdAndUpdate(
       req.params.id,
-      { name, description, budget, status },
+      updateData,
       { new: true, runValidators: true }
-    ).populate('userId', 'name email');
+    )
+      .populate('userId', 'name email')
+      .populate('supervisorId', 'name email');
 
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });

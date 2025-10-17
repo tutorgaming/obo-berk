@@ -15,6 +15,11 @@ const projectSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  supervisorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  },
   status: {
     type: String,
     enum: ['active', 'completed', 'archived'],

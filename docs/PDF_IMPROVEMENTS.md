@@ -18,6 +18,7 @@
 - All text now uses Thai font by default
 - Added bilingual labels (Thai/English) throughout document
 - Font file location: `backend/fonts/THSarabunNew.ttf`
+- **NEW**: Integrated [BAHTTEXT.js](https://github.com/earthchie/BAHTTEXT.js) for Thai number-to-text conversion
 
 **Features**:
 - ✅ Title in Thai: "OBO-Berk (โอโบ-เบิก)"
@@ -26,6 +27,7 @@
 - ✅ Thai date formats supported
 - ✅ Currency in Thai: "บาท" (Baht)
 - ✅ All labels bilingual for better readability
+- ✅ **Total amount in Thai words**: Automatically converts numbers to Thai text (e.g., "1,234.56" → "หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบหกสตางค์")
 
 **Example Output**:
 ```

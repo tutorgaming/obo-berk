@@ -31,7 +31,7 @@ up:
 	docker-compose up -d
 	@echo "Application started!"
 	@echo "Frontend: http://localhost"
-	@echo "Backend API: http://localhost:5000/api"
+	@echo "Backend API: http://localhost:3001/api"
 
 prod: up
 

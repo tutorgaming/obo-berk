@@ -24,13 +24,13 @@ docker-compose up -d
 
 This will start:
 - MongoDB database (port 27017)
-- Backend API (port 5000)
+- Backend API (port 3001)
 - Frontend web app (port 80)
 
 3. **Access the application**
 - Frontend: http://localhost
-- Backend API: http://localhost:5000/api
-- Health check: http://localhost:5000/api/health
+- Backend API: http://localhost:3001/api
+- Health check: http://localhost:3001/api/health
 
 4. **View logs**
 ```bash
@@ -70,7 +70,7 @@ docker-compose -f docker-compose.dev.yml logs -f
 
 This will start:
 - MongoDB database (port 27017)
-- Backend API with nodemon (port 5000)
+- Backend API with nodemon (port 3001)
 - Frontend with Vite HMR (port 5173)
 
 Access at: http://localhost:5173
@@ -158,7 +158,7 @@ Create or modify `backend/.env`:
 
 ```env
 NODE_ENV=production
-PORT=5000
+PORT=5001
 MONGODB_URI=mongodb://mongodb:27017/obo-berk
 UPLOAD_DIR=uploads
 ```
@@ -168,7 +168,7 @@ UPLOAD_DIR=uploads
 For production builds, create `frontend/.env.production`:
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:3001/api
 ```
 
 ## Production Deployment Best Practices
@@ -314,7 +314,7 @@ If ports are already in use:
 # Change ports in docker-compose.yml
 ports:
   - "8080:80"     # Frontend
-  - "5001:5000"   # Backend
+  - "3002:5001"   # Backend (example: change external port)
   - "27018:27017" # MongoDB
 ```
 

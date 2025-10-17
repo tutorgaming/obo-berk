@@ -59,7 +59,7 @@ start_production() {
     echo ""
     echo -e "Access the application at:"
     echo -e "  Frontend:    ${BLUE}http://localhost${NC}"
-    echo -e "  Backend API: ${BLUE}http://localhost:5000/api${NC}"
+    echo -e "  Backend API: ${BLUE}http://localhost:3001/api${NC}"
     echo ""
     echo "To view logs, run: docker-compose logs -f"
 }

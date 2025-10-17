@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProjects, updateProject, deleteProject } from '../services/api';
+import { getProjects, updateProject, deleteProject, getUsers } from '../services/api';
 
 function ProjectManagement() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -13,11 +14,13 @@ function ProjectManagement() {
     name: '',
     description: '',
     budget: '',
-    status: 'active'
+    status: 'active',
+    supervisorId: ''
   });
 
   useEffect(() => {
     fetchProjects();
+    fetchUsers();
   }, []);
 
   const fetchProjects = async () => {
@@ -34,13 +37,23 @@ function ProjectManagement() {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const response = await getUsers();
+      setUsers(response.data);
+    } catch (err) {
+      console.error('Failed to load users:', err);
+    }
+  };
+
   const handleEdit = (project) => {
     setEditingProject(project._id);
     setFormData({
       name: project.name,
       description: project.description || '',
       budget: project.budget || '',
-      status: project.status
+      status: project.status,
+      supervisorId: project.supervisorId?._id || ''
     });
     setError(null);
     setSuccess(null);
@@ -52,7 +65,8 @@ function ProjectManagement() {
       name: '',
       description: '',
       budget: '',
-      status: 'active'
+      status: 'active',
+      supervisorId: ''
     });
     setError(null);
   };
@@ -64,7 +78,8 @@ function ProjectManagement() {
         name: formData.name,
         description: formData.description,
         budget: formData.budget ? parseFloat(formData.budget) : 0,
-        status: formData.status
+        status: formData.status,
+        supervisorId: formData.supervisorId || null
       };
 
       await updateProject(projectId, updateData);
@@ -135,6 +150,7 @@ function ProjectManagement() {
                 <th className="px-4 py-3 text-left">Project Name</th>
                 <th className="px-4 py-3 text-left">Description</th>
                 <th className="px-4 py-3 text-left">Owner</th>
+                <th className="px-4 py-3 text-left">Supervisor</th>
                 <th className="px-4 py-3 text-left">Budget</th>
                 <th className="px-4 py-3 text-left">Status</th>
                 <th className="px-4 py-3 text-center">Actions</th>
@@ -163,6 +179,20 @@ function ProjectManagement() {
                       </td>
                       <td className="px-4 py-3 text-gray-500">
                         {project.userId?.name || 'N/A'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <select
+                          className="w-full p-2 border border-gray-300 rounded text-sm"
+                          value={formData.supervisorId}
+                          onChange={(e) => setFormData({ ...formData, supervisorId: e.target.value })}
+                        >
+                          <option value="">-- No Supervisor --</option>
+                          {users.map(user => (
+                            <option key={user._id} value={user._id}>
+                              {user.name} ({user.email})
+                            </option>
+                          ))}
+                        </select>
                       </td>
                       <td className="px-4 py-3">
                         <input
@@ -214,6 +244,18 @@ function ProjectManagement() {
                           </div>
                           <span>{project.userId?.name || 'N/A'}</span>
                         </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        {project.supervisorId ? (
+                          <div className="flex items-center">
+                            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white mr-2">
+                              {project.supervisorId.name?.charAt(0) || '?'}
+                            </div>
+                            <span>{project.supervisorId.name}</span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 italic">No supervisor</span>
+                        )}
                       </td>
                       <td className="px-4 py-3">
                         {project.budget > 0 ? `฿${project.budget.toLocaleString()}` : '-'}

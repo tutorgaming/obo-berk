@@ -50,7 +50,12 @@ cd frontend && npm install && npm run dev
 
 ## Documentation
 - README.md - Main documentation
-- QUICKSTART.md - 5-minute setup guide
-- DOCKER.md - Docker usage guide
-- DEPLOYMENT.md - Production deployment
-- PROJECT_SUMMARY.md - Complete feature list
+- CHANGELOG.md - Version history and changes
+- docs/ - All detailed documentation
+  - docs/README.md - Documentation index (wiki)
+  - docs/QUICKSTART.md - 5-minute setup guide
+  - docs/DOCKER.md - Docker usage guide
+  - docs/DEPLOYMENT.md - Production deployment
+  - docs/TESTING.md - Testing procedures
+  - docs/PROJECT_SUMMARY.md - Complete feature list
+  - docs/PORT_CHANGES.md - Port configuration

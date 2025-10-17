@@ -72,7 +72,7 @@ echo Application started successfully!
 echo.
 echo Access the application at:
 echo   Frontend:    http://localhost
-echo   Backend API: http://localhost:5000/api
+echo   Backend API: http://localhost:3001/api
 echo.
 echo To view logs, run: docker-compose logs -f
 pause

@@ -12,11 +12,11 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://backend:5000',
+        target: 'http://backend:5001',
         changeOrigin: true,
       },
       '/uploads': {
-        target: 'http://backend:5000',
+        target: 'http://backend:5001',
         changeOrigin: true,
       }
     }
