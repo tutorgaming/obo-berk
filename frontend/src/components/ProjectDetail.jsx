@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getProject, getExpensesByProject, createExpense, updateExpense, deleteExpense, exportProjectPDF } from '../services/api';
 
+// Utility function to get current date in Thailand timezone (UTC+7)
+const getThailandDate = (dateString = null) => {
+  const date = dateString ? new Date(dateString) : new Date();
+  // Convert to Thailand timezone (UTC+7)
+  const thailandTime = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Bangkok' }));
+  // Return in YYYY-MM-DD format for date input
+  return thailandTime.toISOString().split('T')[0];
+};
+
 function ProjectDetail() {
   const { projectId } = useParams();
   const navigate = useNavigate();
@@ -14,10 +23,11 @@ function ProjectDetail() {
   const [selectedType, setSelectedType] = useState('');
   const [previewUrl, setPreviewUrl] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
+    shop_name: '',
+    detail: '',
     type: 'eating',
     amount: '',
-    date: new Date().toISOString().split('T')[0],
+    date: getThailandDate(),
     notes: '',
     receipt: null
   });
@@ -76,7 +86,8 @@ function ProjectDetail() {
       setLoading(true);
 
       const data = new FormData();
-      data.append('name', formData.name);
+      data.append('shop_name', formData.shop_name);
+      data.append('detail', formData.detail);
       data.append('projectId', projectId);
       data.append('type', formData.type);
       data.append('amount', formData.amount);
@@ -90,10 +101,11 @@ function ProjectDetail() {
       const response = await createExpense(data);
       setExpenses([response.data, ...expenses]);
       setFormData({
-        name: '',
+        shop_name: '',
+        detail: '',
         type: 'eating',
         amount: '',
-        date: new Date().toISOString().split('T')[0],
+        date: getThailandDate(),
         notes: '',
         receipt: null
       });
@@ -131,10 +143,11 @@ function ProjectDetail() {
     setEditingExpense(expense._id);
     setCurrentExpense(expense); // Store current expense to show existing receipt
     setFormData({
-      name: expense.name,
+      shop_name: expense.shop_name || '',
+      detail: expense.detail || '',
       type: expense.type,
       amount: expense.amount,
-      date: new Date(expense.date).toISOString().split('T')[0],
+      date: getThailandDate(expense.date),
       notes: expense.notes || '',
       receipt: null
     });
@@ -149,7 +162,8 @@ function ProjectDetail() {
       setLoading(true);
 
       const data = new FormData();
-      data.append('name', formData.name);
+      data.append('shop_name', formData.shop_name);
+      data.append('detail', formData.detail);
       data.append('type', formData.type);
       data.append('amount', formData.amount);
       data.append('date', formData.date);
@@ -162,10 +176,11 @@ function ProjectDetail() {
       const response = await updateExpense(editingExpense, data);
       setExpenses(expenses.map(exp => exp._id === editingExpense ? response.data : exp));
       setFormData({
-        name: '',
+        shop_name: '',
+        detail: '',
         type: 'eating',
         amount: '',
-        date: new Date().toISOString().split('T')[0],
+        date: getThailandDate(),
         notes: '',
         receipt: null
       });
@@ -186,10 +201,11 @@ function ProjectDetail() {
     setEditingExpense(null);
     setCurrentExpense(null); // Clear current expense
     setFormData({
-      name: '',
+      shop_name: '',
+      detail: '',
       type: 'eating',
       amount: '',
-      date: new Date().toISOString().split('T')[0],
+      date: getThailandDate(),
       notes: '',
       receipt: null
     });
@@ -346,13 +362,14 @@ function ProjectDetail() {
               <div className="flex-1">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-gray-700 mb-1">Expense Name *</label>
+                    <label className="block text-gray-700 mb-1">Shop Name *</label>
                     <input
                       type="text"
                       required
+                      placeholder="e.g., 7-Eleven, McDonald's"
                       className="w-full p-2 border border-gray-300 rounded-lg"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      value={formData.shop_name}
+                      onChange={(e) => setFormData({ ...formData, shop_name: e.target.value })}
                     />
                   </div>
                   <div>
@@ -369,6 +386,16 @@ function ProjectDetail() {
                       <option value="equipment">Equipment</option>
                       <option value="other">Other</option>
                     </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-gray-700 mb-1">Detail</label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Lunch for team meeting, Taxi to client office"
+                      className="w-full p-2 border border-gray-300 rounded-lg"
+                      value={formData.detail}
+                      onChange={(e) => setFormData({ ...formData, detail: e.target.value })}
+                    />
                   </div>
                   <div>
                     <label className="block text-gray-700 mb-1">Amount (฿) *</label>
@@ -520,7 +547,7 @@ function ProjectDetail() {
               <thead className="bg-gray-100">
                 <tr>
                   <th className="px-4 py-2 text-left">Date</th>
-                  <th className="px-4 py-2 text-left">Name</th>
+                  <th className="px-4 py-2 text-left">Shop / Detail</th>
                   <th className="px-4 py-2 text-left">Type</th>
                   <th className="px-4 py-2 text-right">Amount (฿)</th>
                   <th className="px-4 py-2 text-center">Receipt</th>
@@ -531,13 +558,20 @@ function ProjectDetail() {
                 {filteredExpenses.map(expense => (
                   <tr key={expense._id} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-3">
-                      {new Date(expense.date).toLocaleDateString('th-TH')}
+                      {new Date(expense.date).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok' })}
                     </td>
                     <td className="px-4 py-3">
-                      {expense.name}
-                      {expense.notes && (
-                        <p className="text-sm text-gray-500">{expense.notes}</p>
-                      )}
+                      <div>
+                        {expense.shop_name && (
+                          <p className="font-semibold text-gray-900">🏪 {expense.shop_name}</p>
+                        )}
+                        {expense.detail && (
+                          <p className="text-sm text-gray-600 mt-1">{expense.detail}</p>
+                        )}
+                        {expense.notes && (
+                          <p className="text-xs text-gray-400 mt-1 italic">Note: {expense.notes}</p>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-1 bg-gray-100 rounded text-sm">

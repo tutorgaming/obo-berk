@@ -73,10 +73,12 @@ router.get('/:id', async (req, res) => {
 // Create new expense with file upload
 router.post('/', upload.single('receipt'), async (req, res) => {
   try {
-    const { name, projectId, type, amount, date, notes } = req.body;
+    const { name, shop_name, detail, projectId, type, amount, date, notes } = req.body;
 
     const expenseData = {
       name,
+      shop_name,
+      detail,
       projectId,
       type,
       amount: parseFloat(amount),
@@ -113,10 +115,12 @@ router.post('/', upload.single('receipt'), async (req, res) => {
 // Update expense
 router.put('/:id', upload.single('receipt'), async (req, res) => {
   try {
-    const { name, type, amount, date, notes } = req.body;
+    const { name, shop_name, detail, type, amount, date, notes } = req.body;
 
     const updateData = {
       name,
+      shop_name,
+      detail,
       type,
       amount: parseFloat(amount),
       date,

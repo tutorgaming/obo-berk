@@ -95,7 +95,7 @@ router.get('/project/:projectId/pdf', async (req, res) => {
     // Date Generated
     doc.font('ThaiFont').fontSize(13);
     doc.text(
-      `วันที่: ${new Date().toLocaleString('th-TH')}`,
+      `วันที่: ${new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' })}`,
       { align: 'right' }
     );
 
@@ -128,19 +128,19 @@ router.get('/project/:projectId/pdf', async (req, res) => {
 
     // Column positions and widths
     const col1X = tableLeft;        // ลำดับที่ (No)
-    const col1W = 35;
+    const col1W = 30;
     const col2X = col1X + col1W;    // วันที่ (Date)
-    const col2W = 65;
+    const col2W = 60;
     const col3X = col2X + col2W;    // ร้านค้า (Shop Name)
-    const col3W = 90;
+    const col3W = 110;
     const col4X = col3X + col3W;    // รายละเอียด (Detail)
-    const col4W = 110;
+    const col4W = 120;
     const col5X = col4X + col4W;    // จำนวนเงิน (Amount)
     const col5W = 70;
     const col6X = col5X + col5W;    // หมายเหตุ (Note)
     const col6W = tableWidth - col1W - col2W - col3W - col4W - col5W;
 
-    const rowHeight = 25;
+    const rowHeight = 22;
     let currentY = tableTop;
 
     // Draw table header
@@ -148,7 +148,7 @@ router.get('/project/:projectId/pdf', async (req, res) => {
     doc.rect(tableLeft, currentY, tableWidth, rowHeight).fill('#f0f0f0');
 
     // Header text
-    doc.fillColor('#000000').font('ThaiFontBold').fontSize(9);
+    doc.fillColor('#000000').font('ThaiFontBold').fontSize(12);
     doc.text('ลำดับ', col1X + 2, currentY + 7, { width: col1W - 4, align: 'center' });
     doc.text('วันที่', col2X + 2, currentY + 7, { width: col2W - 4, align: 'center' });
     doc.text('ร้านค้า', col3X + 2, currentY + 7, { width: col3W - 4, align: 'center' });
@@ -167,7 +167,7 @@ router.get('/project/:projectId/pdf', async (req, res) => {
     currentY += rowHeight;
 
     // Expense rows
-    doc.font('ThaiFont').fontSize(9);
+    doc.font('ThaiFont').fontSize(12);
     expenses.forEach((expense, index) => {
       // Check if we need a new page
       if (currentY > 720) {
@@ -199,7 +199,8 @@ router.get('/project/:projectId/pdf', async (req, res) => {
       const expenseDate = new Date(expense.date).toLocaleDateString('th-TH', {
         year: 'numeric',
         month: '2-digit',
-        day: '2-digit'
+        day: '2-digit',
+        timeZone: 'Asia/Bangkok'
       });
       const shopName = expense.shop_name || expense.name || '-';
       const expenseDetail = expense.detail || '-';
@@ -256,8 +257,12 @@ router.get('/project/:projectId/pdf', async (req, res) => {
     // Add certification paragraph and signature area
     currentY += 30; // Space after table
 
-    // Check if we need a new page for certification
-    if (currentY > 650) {
+    // Check if we need a new page for certification and signatures
+    // Certification paragraph: ~100px, Signatures: ~150px (employee + supervisor)
+    // Total needed: ~250px to be safe
+    const spaceNeeded = project.supervisorId ? 280 : 200; // More space if supervisor exists
+
+    if (currentY + spaceNeeded > 750) { // 750 is safer than 650 for page height
       doc.addPage();
       currentY = 50;
     }
@@ -266,12 +271,14 @@ router.get('/project/:projectId/pdf', async (req, res) => {
     const startDate = new Date(expenses[0].date).toLocaleDateString('th-TH', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      timeZone: 'Asia/Bangkok'
     });
     const endDate = new Date(expenses[expenses.length - 1].date).toLocaleDateString('th-TH', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      timeZone: 'Asia/Bangkok'
     });
 
     // Total amount in words area
@@ -366,7 +373,7 @@ router.get('/project/:projectId/pdf', async (req, res) => {
       doc.text(`${i + 1}. ${displayName}`, xPosition, yPosition, { width: receiptWidth });
 
       doc.font('ThaiFont').fontSize(9);
-      doc.text(`วันที่/Date: ${new Date(expense.date).toLocaleDateString('th-TH')}`, xPosition, yPosition + 14, { width: receiptWidth });
+      doc.text(`วันที่/Date: ${new Date(expense.date).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok' })}`, xPosition, yPosition + 14, { width: receiptWidth });
       if (expense.detail) {
         doc.text(`รายละเอียด/Detail: ${expense.detail}`, xPosition, yPosition + 26, { width: receiptWidth });
       }
@@ -374,7 +381,9 @@ router.get('/project/:projectId/pdf', async (req, res) => {
 
       // Format amount properly for Thai display
       const formattedAmount = expense.amount.toLocaleString('en-US', { minimumFractionDigits: 2 });
-      doc.text(`จำนวน/Amount: ${formattedAmount} บาท`, xPosition, yPosition + (expense.detail ? 50 : 38), { width: receiptWidth });      // Add receipt image if exists
+      doc.text(`จำนวน/Amount: ${formattedAmount} บาท`, xPosition, yPosition + (expense.detail ? 50 : 38), { width: receiptWidth });
+
+      // Add receipt image if exists
       if (expense.receiptFile && expense.receiptFile.path) {
         const receiptPath = expense.receiptFile.path;
 
@@ -384,25 +393,25 @@ router.get('/project/:projectId/pdf', async (req, res) => {
             const isImage = /\.(jpg|jpeg|png)$/i.test(receiptPath);
 
             if (isImage) {
-              doc.fontSize(8).text('ใบเสร็จ/Receipt:', xPosition, yPosition + 50, { width: receiptWidth });
+              doc.fontSize(8).text('ใบเสร็จ/Receipt:', xPosition, yPosition + (expense.detail ? 62 : 50), { width: receiptWidth });
 
               // Add image with larger dimensions (increased from 230x110 to 240x130)
-              doc.image(receiptPath, xPosition, yPosition + 62, {
+              doc.image(receiptPath, xPosition, yPosition + (expense.detail ? 74 : 62), {
                 fit: [receiptWidth - 10, receiptHeight - 62],
                 align: 'left'
               });
             } else {
-              doc.fontSize(8).text('ใบเสร็จ/Receipt: PDF file', xPosition, yPosition + 50, { width: receiptWidth });
+              doc.fontSize(8).text('ใบเสร็จ/Receipt: PDF file', xPosition, yPosition + (expense.detail ? 62 : 50), { width: receiptWidth });
             }
           } catch (err) {
             console.error('Error adding image:', err);
-            doc.fontSize(8).text('ใบเสร็จ/Receipt: Error loading', xPosition, yPosition + 50, { width: receiptWidth });
+            doc.fontSize(8).text('ใบเสร็จ/Receipt: Error loading', xPosition, yPosition + (expense.detail ? 62 : 50), { width: receiptWidth });
           }
         } else {
-          doc.fontSize(8).text('ใบเสร็จ/Receipt: File not found', xPosition, yPosition + 50, { width: receiptWidth });
+          doc.fontSize(8).text('ใบเสร็จ/Receipt: File not found', xPosition, yPosition + (expense.detail ? 62 : 50), { width: receiptWidth });
         }
       } else {
-        doc.fontSize(8).text('ใบเสร็จ/Receipt: No receipt uploaded', xPosition, yPosition + 50, { width: receiptWidth });
+        doc.fontSize(8).text('ใบเสร็จ/Receipt: No receipt uploaded', xPosition, yPosition + (expense.detail ? 62 : 50), { width: receiptWidth });
       }
 
       if (expense.notes) {
