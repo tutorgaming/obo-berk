@@ -1,0 +1,71 @@
+# Development docker-compose with hot reload
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: obo-berk-mongodb-dev
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: obo-berk
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data_dev:/data/db
+    networks:
+      - obo-berk-network
+
+  # Backend API (Development with hot reload)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: obo-berk-backend-dev
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/obo-berk
+      - UPLOAD_DIR=uploads
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/uploads:/app/uploads  # ← Host directory mapping
+    depends_on:
+      - mongodb
+    networks:
+      - obo-berk-network
+    command: npm run dev
+
+  # Frontend (Development with hot reload)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: obo-berk-frontend-dev
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - obo-berk-network
+    command: npm run dev
+
+networks:
+  obo-berk-network:
+    driver: bridge
+
+volumes:
+  mongodb_data_dev:
+    driver: local
+  uploads_data_dev:
+    driver: local
