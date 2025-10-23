@@ -10,7 +10,7 @@ const Expense = require('../models/Expense');
 // Export project expenses as PDF
 router.get('/project/:projectId/pdf', async (req, res) => {
   try {
-    const { type } = req.query; // Optional: filter by expense type
+    const { type, onlyWithReceipts } = req.query; // Optional: filter by expense type and receipt availability
 
     // Get project details
     const project = await Project.findById(req.params.projectId)
@@ -90,7 +90,7 @@ router.get('/project/:projectId/pdf', async (req, res) => {
       doc.font('ThaiFontBold').fontSize(14).text(`ประเภท / Category: ${categoryLabel}`, { align: 'center' });
     }
 
-    doc.moveDown();
+    // doc.moveDown();
 
     // Date Generated
     doc.font('ThaiFont').fontSize(13);
@@ -115,7 +115,7 @@ router.get('/project/:projectId/pdf', async (req, res) => {
     //   doc.text(`แผนก / Department: ${project.userId.department}`);
     // }
     //doc.text(`สร้างรายงาน / Generated: ${new Date().toLocaleString('th-TH')}`);
-    doc.moveDown();
+    // doc.moveDown();
 
     // Calculate total (will be used in table footer)
     const totalAmount = expenses.reduce((sum, exp) => sum + exp.amount, 0);
@@ -262,7 +262,7 @@ router.get('/project/:projectId/pdf', async (req, res) => {
     // Total needed: ~250px to be safe
     const spaceNeeded = project.supervisorId ? 280 : 200; // More space if supervisor exists
 
-    if (currentY + spaceNeeded > 750) { // 750 is safer than 650 for page height
+    if (currentY + spaceNeeded > 900) { // 750 is safer than 650 for page height
       doc.addPage();
       currentY = 50;
     }
@@ -284,18 +284,19 @@ router.get('/project/:projectId/pdf', async (req, res) => {
     // Total amount in words area
     doc.font('ThaiFont').fontSize(12);
     const totalInWords = bahttext.bahttext(totalAmount);
-    doc.text('รวมทั้งสิ้น ', tableLeft, currentY, { continued: true });
-    doc.font('ThaiFontBold').text(`${totalInWords}`, { continued: false });
-    currentY += 30;
+    doc.font('ThaiFontBold').text(`รวมทั้งสิ้น  ${totalInWords}`, tableLeft, currentY, { align: 'center' });
+    currentY += 20;
 
     // Certification paragraph
     doc.font('ThaiFont').fontSize(14);
     const certText = `ข้าพเจ้า ${project.userId.name} ตำแหน่ง ${project.userId.department || '_______________'} ขอรับรองว่า รายจ่ายขั้นต้นนี้ ไม่อาจเรียกเก็บใบเสร็จจากผู้รับได้ และข้าพเจ้าได้จ่ายไปในงานของทางบริษัท / ห้างหุ้นส่วนจำกัด โดยแท้ ตั้งแต่ ${startDate} จนถึงวันที่ ${endDate}`;
+    // Indent Paragraph
 
     doc.text(certText, tableLeft, currentY, {
       width: tableWidth,
       align: 'left',
-      lineGap: 5
+      lineGap: 5,
+      indent: 30
     });
 
     currentY += 80; // Space for paragraph
@@ -342,17 +343,36 @@ router.get('/project/:projectId/pdf', async (req, res) => {
     doc.font('ThaiFontBold').fontSize(16).text('รายละเอียดค่าใช้จ่ายและใบเสร็จ / Expense Details with Receipts', 50, 50);
     doc.moveDown();
 
+    // Filter expenses for receipt section if onlyWithReceipts is true, but keep track of original indices
+    let expensesForReceipts;
+    if (onlyWithReceipts === 'true') {
+      expensesForReceipts = [];
+      expenses.forEach((exp, index) => {
+        if (exp.receiptFile && exp.receiptFile.path) {
+          expensesForReceipts.push({
+            ...exp.toObject(),
+            originalIndex: index + 1
+          });
+        }
+      });
+    } else {
+      expensesForReceipts = expenses.map((exp, index) => ({
+        ...exp.toObject(),
+        originalIndex: index + 1
+      }));
+    }
+
     let detailY = doc.y;
     let receiptsOnCurrentPage = 0;
     const maxReceiptsPerPage = 4;
-    const receiptWidth = 250  // Slightly larger width for 2 columns
-    const receiptHeight = 200 // Slightly larger height for 2 rows
+    const receiptWidth = 350  // Slightly larger width for 2 columns
+    const receiptHeight = 280 // Slightly larger height for 2 rows
     const leftColumnX = 50
     const rightColumnX = 310
-    const verticalSpacing = 220 // Space between rows (increased for larger images)
+    const verticalSpacing = 300 // Space between rows (increased for larger images)
 
-    for (let i = 0; i < expenses.length; i++) {
-      const expense = expenses[i];
+    for (let i = 0; i < expensesForReceipts.length; i++) {
+      const expense = expensesForReceipts[i];
 
       // Start a new page if we've placed 4 receipts
       if (receiptsOnCurrentPage >= maxReceiptsPerPage) {
@@ -370,7 +390,7 @@ router.get('/project/:projectId/pdf', async (req, res) => {
       // Add expense info with Thai font
       const displayName = expense.shop_name || expense.name || 'ไม่ระบุ';
       doc.font('ThaiFontBold').fontSize(11);
-      doc.text(`${i + 1}. ${displayName}`, xPosition, yPosition, { width: receiptWidth });
+      doc.text(`${expense.originalIndex}. ${displayName}`, xPosition, yPosition, { width: receiptWidth });
 
       doc.font('ThaiFont').fontSize(9);
       doc.text(`วันที่/Date: ${new Date(expense.date).toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok' })}`, xPosition, yPosition + 14, { width: receiptWidth });

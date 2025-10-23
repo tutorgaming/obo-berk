@@ -40,8 +40,11 @@ export const updateExpense = (id, formData) => {
 export const deleteExpense = (id) => api.delete(`/expenses/${id}`);
 
 // Export
-export const exportProjectPDF = (projectId, type) => {
-  const params = type ? { type } : {};
+export const exportProjectPDF = (projectId, type, onlyWithReceipts) => {
+  const params = {};
+  if (type) params.type = type;
+  if (onlyWithReceipts) params.onlyWithReceipts = 'true';
+
   return api.get(`/export/project/${projectId}/pdf`, {
     params,
     responseType: 'blob'

@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Thai number-to-text conversion using BAHTTEXT.js for PDF total amount display
 - Automatic conversion of numbers to Thai pronunciation (e.g., "1,234.56" → "หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบหกสตางค์")
+- **Shop name autocomplete feature** in expense form for faster data entry
+  - Smart suggestions based on previously used shop names in the project
+  - Real-time filtering as you type
+  - Keyboard navigation support (Arrow keys, Enter, Escape)
+  - Click-to-select functionality
 
 ### Changed
 - Reorganized documentation into `docs/` directory for better organization

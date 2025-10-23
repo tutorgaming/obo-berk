@@ -22,6 +22,7 @@ function ProjectDetail() {
   const [currentExpense, setCurrentExpense] = useState(null);
   const [selectedType, setSelectedType] = useState('');
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [onlyWithReceipts, setOnlyWithReceipts] = useState(false);
   const [formData, setFormData] = useState({
     shop_name: '',
     detail: '',
@@ -33,6 +34,9 @@ function ProjectDetail() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [shopNameSuggestions, setShopNameSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
 
   useEffect(() => {
     fetchProject();
@@ -46,6 +50,12 @@ function ProjectDetail() {
       setFilteredExpenses(expenses);
     }
   }, [selectedType, expenses]);
+
+  // Get unique shop names for autocomplete
+  useEffect(() => {
+    const uniqueShops = [...new Set(expenses.map(exp => exp.shop_name).filter(Boolean))];
+    setShopNameSuggestions(uniqueShops);
+  }, [expenses]);
 
   // Cleanup preview URL when component unmounts or preview changes
   useEffect(() => {
@@ -139,6 +149,48 @@ function ProjectDetail() {
     }
   };
 
+  const handleShopNameChange = (value) => {
+    setFormData({ ...formData, shop_name: value });
+    setShowSuggestions(value.length > 0);
+    setSelectedSuggestionIndex(-1);
+  };
+
+  const handleSelectSuggestion = (shopName) => {
+    setFormData({ ...formData, shop_name: shopName });
+    setShowSuggestions(false);
+    setSelectedSuggestionIndex(-1);
+  };
+
+  const getFilteredSuggestions = () => {
+    if (!formData.shop_name) return shopNameSuggestions;
+    const searchTerm = formData.shop_name.toLowerCase();
+    return shopNameSuggestions.filter(shop =>
+      shop.toLowerCase().includes(searchTerm)
+    );
+  };
+
+  const handleShopNameKeyDown = (e) => {
+    const filteredSuggestions = getFilteredSuggestions();
+
+    if (!showSuggestions || filteredSuggestions.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev =>
+        prev < filteredSuggestions.length - 1 ? prev + 1 : prev
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
+    } else if (e.key === 'Enter' && selectedSuggestionIndex >= 0) {
+      e.preventDefault();
+      handleSelectSuggestion(filteredSuggestions[selectedSuggestionIndex]);
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+    }
+  };
+
   const handleEdit = (expense) => {
     setEditingExpense(expense._id);
     setCurrentExpense(expense); // Store current expense to show existing receipt
@@ -229,7 +281,7 @@ function ProjectDetail() {
   const handleExportPDF = async () => {
     try {
       setLoading(true);
-      const response = await exportProjectPDF(projectId, selectedType);
+      const response = await exportProjectPDF(projectId, selectedType, onlyWithReceipts);
 
       // Create blob link to download
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -304,7 +356,19 @@ function ProjectDetail() {
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Expenses</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
+              <input
+                type="checkbox"
+                id="onlyWithReceipts"
+                checked={onlyWithReceipts}
+                onChange={(e) => setOnlyWithReceipts(e.target.checked)}
+                className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
+              />
+              <label htmlFor="onlyWithReceipts" className="text-sm text-gray-700 cursor-pointer">
+                Only receipts with images
+              </label>
+            </div>
             <button
               onClick={handleExportPDF}
               disabled={loading || filteredExpenses.length === 0}
@@ -361,7 +425,7 @@ function ProjectDetail() {
               {/* Form Fields - Left Side */}
               <div className="flex-1">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
+                  <div className="relative">
                     <label className="block text-gray-700 mb-1">Shop Name *</label>
                     <input
                       type="text"
@@ -369,8 +433,29 @@ function ProjectDetail() {
                       placeholder="e.g., 7-Eleven, McDonald's"
                       className="w-full p-2 border border-gray-300 rounded-lg"
                       value={formData.shop_name}
-                      onChange={(e) => setFormData({ ...formData, shop_name: e.target.value })}
+                      onChange={(e) => handleShopNameChange(e.target.value)}
+                      onKeyDown={handleShopNameKeyDown}
+                      onFocus={() => setShowSuggestions(formData.shop_name.length > 0)}
+                      onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                      autoComplete="off"
                     />
+                    {showSuggestions && getFilteredSuggestions().length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        {getFilteredSuggestions().map((shop, index) => (
+                          <div
+                            key={index}
+                            className={`px-4 py-2 cursor-pointer text-sm ${
+                              index === selectedSuggestionIndex
+                                ? 'bg-blue-500 text-white'
+                                : 'hover:bg-blue-100'
+                            }`}
+                            onClick={() => handleSelectSuggestion(shop)}
+                          >
+                            {shop}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-gray-700 mb-1">Type *</label>
