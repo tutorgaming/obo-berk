@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getProjectsByUser, createProject } from '../services/api';
+import { getProjectsByUser, createProject, getUsers } from '../services/api';
 
 function ProjectList({ userId, userName }) {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
+  const [users, setUsers] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    budget: ''
+    budget: '',
+    supervisorId: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -17,6 +19,7 @@ function ProjectList({ userId, userName }) {
   useEffect(() => {
     if (userId) {
       fetchProjects();
+      fetchUsers();
     }
   }, [userId]);
 
@@ -34,6 +37,15 @@ function ProjectList({ userId, userName }) {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const response = await getUsers();
+      setUsers(response.data);
+    } catch (err) {
+      console.error('Failed to load users:', err);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -41,11 +53,12 @@ function ProjectList({ userId, userName }) {
       const projectData = {
         ...formData,
         userId,
-        budget: parseFloat(formData.budget) || 0
+        budget: parseFloat(formData.budget) || 0,
+        supervisorId: formData.supervisorId || null
       };
       const response = await createProject(projectData);
       setProjects([response.data, ...projects]);
-      setFormData({ name: '', description: '', budget: '' });
+      setFormData({ name: '', description: '', budget: '', supervisorId: '' });
       setShowForm(false);
       setError(null);
     } catch (err) {
@@ -106,6 +119,24 @@ function ProjectList({ userId, userName }) {
               value={formData.budget}
               onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
             />
+          </div>
+          <div className="mb-3">
+            <label className="block text-gray-700 mb-1">Supervisor (Optional)</label>
+            <select
+              className="w-full p-2 border border-gray-300 rounded-lg"
+              value={formData.supervisorId}
+              onChange={(e) => setFormData({ ...formData, supervisorId: e.target.value })}
+            >
+              <option value="">-- No Supervisor --</option>
+              {users.map(user => (
+                <option key={user._id} value={user._id}>
+                  {user.name} ({user.email})
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              💡 Select a supervisor for approval signature on PDF exports
+            </p>
           </div>
           <button
             type="submit"

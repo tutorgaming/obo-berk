@@ -52,6 +52,16 @@ function UserSelection({ selectedUser, setSelectedUser }) {
     <div className="bg-white rounded-lg shadow-md p-6 mb-8">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Select User</h2>
 
+      {/* Tips */}
+      <div className="mb-4 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
+        <p className="text-xs text-gray-600">
+          💡 <strong>First Time User:</strong> กรุณา Add User ตัวเอง และ User ที่เป็นชื่อหัวหน้าด้วย จะได้มีช่องเซนต์หัวหน้า
+        </p>
+        <p className="text-xs text-gray-600 mt-1">
+          ℹ️ ถ้าไม่มีชื่อหัวหน้า ตรงที่เซนต์อนุมัติจะมีบรรทัดชื่อเราอันเดียว
+        </p>
+      </div>
+
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
