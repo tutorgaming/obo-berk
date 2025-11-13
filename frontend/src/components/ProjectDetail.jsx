@@ -37,6 +37,11 @@ function ProjectDetail() {
   const [shopNameSuggestions, setShopNameSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const [ocrProcessing, setOcrProcessing] = useState(false);
+
+  // N8N API Configuration
+  const N8N_OCR_API_URL = 'https://your-n8n-instance.com/webhook/ocr-receipt'; // Replace with your n8n webhook URL
+  const ENABLE_OCR_FEATURE = false; // Set to false to disable OCR button
 
   useEffect(() => {
     fetchProject();
@@ -188,6 +193,77 @@ function ProjectDetail() {
     } else if (e.key === 'Escape') {
       setShowSuggestions(false);
       setSelectedSuggestionIndex(-1);
+    }
+  };
+
+  const handleOCRUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file (JPG, PNG, etc.)');
+      return;
+    }
+
+    try {
+      setOcrProcessing(true);
+
+      // Create FormData to send image
+      const formData = new FormData();
+      formData.append('image', file);
+
+      // TODO: Replace with actual n8n API call
+      // const response = await fetch(N8N_OCR_API_URL, {
+      //   method: 'POST',
+      //   body: formData,
+      // });
+      // const data = await response.json();
+
+      // Simulate API response for now
+      console.log('Uploading to n8n OCR API:', N8N_OCR_API_URL);
+      console.log('File:', file.name);
+
+      // Simulated delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Example response structure from n8n:
+      // {
+      //   "shop_name": "7-Eleven",
+      //   "amount": "150.50",
+      //   "date": "2025-11-13",
+      //   "detail": "Snacks and drinks",
+      //   "type": "eating"
+      // }
+
+      // Simulated response - Replace this with actual API call
+      const mockOCRResult = {
+        shop_name: "7-Eleven (OCR)",
+        amount: "125.50",
+        date: getThailandDate(),
+        detail: "Processed from receipt image",
+        type: "eating"
+      };
+
+      // Auto-fill form with OCR results
+      setFormData(prev => ({
+        ...prev,
+        shop_name: mockOCRResult.shop_name || prev.shop_name,
+        amount: mockOCRResult.amount || prev.amount,
+        date: mockOCRResult.date || prev.date,
+        detail: mockOCRResult.detail || prev.detail,
+        type: mockOCRResult.type || prev.type,
+      }));
+
+      alert('✅ OCR processing complete! Form auto-filled with detected information.');
+
+    } catch (error) {
+      console.error('OCR processing error:', error);
+      alert('❌ Failed to process image. Please try again or fill the form manually.');
+    } finally {
+      setOcrProcessing(false);
+      // Reset file input
+      e.target.value = '';
     }
   };
 
@@ -421,6 +497,59 @@ function ProjectDetail() {
             <h3 className="text-xl font-semibold mb-4">
               {editingExpense ? '✏️ Edit Expense' : '➕ Add New Expense'}
             </h3>
+
+            {/* OCR Upload Button */}
+            {!editingExpense && (
+              <div className="mb-4 p-3 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex-1">
+                    <h4 className="text-sm font-semibold text-purple-800">
+                      🤖 Smart OCR - Auto-fill from Receipt
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      API: {N8N_OCR_API_URL}
+                    </p>
+                    {!ENABLE_OCR_FEATURE && (
+                      <p className="text-xs text-red-500 mt-0.5 font-semibold">
+                        ⚠️ Feature currently disabled - ตต เหน่ยก่อน 5555
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <label className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                      !ENABLE_OCR_FEATURE || ocrProcessing
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-purple-600 hover:bg-purple-700 text-white shadow-md hover:shadow-lg cursor-pointer'
+                    }`}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleOCRUpload}
+                        disabled={!ENABLE_OCR_FEATURE || ocrProcessing}
+                      />
+                      {ocrProcessing ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          📸 Upload Receipt for OCR
+                        </>
+                      )}
+                    </label>
+                  </div>
+                </div>
+                {/* <p className="text-xs text-gray-500 mt-2">
+                  💡 Tip: Take a clear photo of your receipt for best results
+                </p> */}
+              </div>
+            )}
+
             <div className="flex gap-6">
               {/* Form Fields - Left Side */}
               <div className="flex-1">

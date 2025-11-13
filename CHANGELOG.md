@@ -20,6 +20,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Automatic fallback if logo not found
   - Responsive sizing with proper aspect ratio
   - Sample SVG logo included as placeholder
+  - Logo spin easter egg (random spin + hover effect)
+- **OCR Receipt Auto-fill Feature** - AI-powered receipt scanning
+  - Upload receipt images to extract information automatically
+  - Integration with n8n workflow for OCR processing
+  - Auto-fill form fields (shop name, amount, date, details)
+  - Beautiful UI with loading states and animations
+  - Easy enable/disable toggle for the feature
+  - Placeholder implementation ready for n8n API integration
 
 ### Changed
 - Reorganized documentation into `docs/` directory for better organization
