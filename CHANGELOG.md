@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Real-time filtering as you type
   - Keyboard navigation support (Arrow keys, Enter, Escape)
   - Click-to-select functionality
+- **Logo support in header** - Display company logo beside the heading
+  - Flexible format support (PNG, JPG, SVG)
+  - Automatic fallback if logo not found
+  - Responsive sizing with proper aspect ratio
+  - Sample SVG logo included as placeholder
 
 ### Changed
 - Reorganized documentation into `docs/` directory for better organization

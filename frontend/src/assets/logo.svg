@@ -1,0 +1,14 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="24" cy="24" r="22" fill="#FFFFFF" stroke="#3B82F6" stroke-width="2"/>
+
+  <!-- OBO Text styled -->
+  <text x="24" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#3B82F6" text-anchor="middle">
+    OBO
+  </text>
+
+  <!-- Small receipt icon -->
+  <g transform="translate(12, 8)">
+    <rect x="0" y="0" width="24" height="6" rx="1" fill="#3B82F6" opacity="0.3"/>
+  </g>
+</svg>
