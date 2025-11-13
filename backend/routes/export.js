@@ -14,8 +14,8 @@ router.get('/project/:projectId/pdf', async (req, res) => {
 
     // Get project details
     const project = await Project.findById(req.params.projectId)
-      .populate('userId', 'name email department')
-      .populate('supervisorId', 'name email department');
+      .populate('userId', 'name email position')
+      .populate('supervisorId', 'name email position');
 
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
@@ -289,7 +289,7 @@ router.get('/project/:projectId/pdf', async (req, res) => {
 
     // Certification paragraph
     doc.font('ThaiFont').fontSize(14);
-    const certText = `ข้าพเจ้า ${project.userId.name} ตำแหน่ง ${project.userId.department || '_______________'} ขอรับรองว่า รายจ่ายขั้นต้นนี้ ไม่อาจเรียกเก็บใบเสร็จจากผู้รับได้ และข้าพเจ้าได้จ่ายไปในงานของทางบริษัท / ห้างหุ้นส่วนจำกัด โดยแท้ ตั้งแต่ ${startDate} จนถึงวันที่ ${endDate}`;
+    const certText = `ข้าพเจ้า ${project.userId.name} ตำแหน่ง ${project.userId.position || '_______________'} ขอรับรองว่า รายจ่ายขั้นต้นนี้ ไม่อาจเรียกเก็บใบเสร็จจากผู้รับได้ และข้าพเจ้าได้จ่ายไปในงานของทางบริษัท / ห้างหุ้นส่วนจำกัด โดยแท้ ตั้งแต่ ${startDate} จนถึงวันที่ ${endDate}`;
     // Indent Paragraph
 
     doc.text(certText, tableLeft, currentY, {

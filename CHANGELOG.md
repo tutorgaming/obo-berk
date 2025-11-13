@@ -28,10 +28,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Beautiful UI with loading states and animations
   - Easy enable/disable toggle for the feature
   - Placeholder implementation ready for n8n API integration
+- **Supervisor selection in project creation** - Select supervisor for approval signatures
+- **User tips/legend** - Improved user guidance with compact info boxes
 
 ### Changed
 - Reorganized documentation into `docs/` directory for better organization
 - Updated port configuration to avoid macOS conflicts (5000→5001, 6000→3001)
+- **Changed 'Department' field to 'Position'** for user profiles
+  - Updated database model (User.department → User.position)
+  - Updated all frontend components (UserSelection, UserManagement)
+  - Updated PDF export to use position instead of department
+  - Updated API population fields in project routes
 
 ## [1.0.0] - 2025-10-17
 

@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
-  department: {
+  position: {
     type: String,
     trim: true
   }

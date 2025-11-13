@@ -7,7 +7,7 @@ function UserSelection({ selectedUser, setSelectedUser }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    department: ''
+    position: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -37,7 +37,7 @@ function UserSelection({ selectedUser, setSelectedUser }) {
       const response = await createUser(formData);
       setUsers([response.data, ...users]);
       setSelectedUser(response.data);
-      setFormData({ name: '', email: '', department: '' });
+      setFormData({ name: '', email: '', position: '' });
       setShowForm(false);
       setError(null);
     } catch (err) {
@@ -94,8 +94,8 @@ function UserSelection({ selectedUser, setSelectedUser }) {
           <p className="text-sm text-gray-600">Selected User:</p>
           <p className="font-semibold text-lg">{selectedUser.name}</p>
           <p className="text-sm text-gray-600">{selectedUser.email}</p>
-          {selectedUser.department && (
-            <p className="text-sm text-gray-600">Department: {selectedUser.department}</p>
+          {selectedUser.position && (
+            <p className="text-sm text-gray-600">Position: {selectedUser.position}</p>
           )}
         </div>
       )}
@@ -133,12 +133,13 @@ function UserSelection({ selectedUser, setSelectedUser }) {
             />
           </div>
           <div className="mb-3">
-            <label className="block text-gray-700 mb-1">Department</label>
+            <label className="block text-gray-700 mb-1">Position</label>
             <input
               type="text"
+              placeholder="e.g., Manager, Engineer, Accountant"
               className="w-full p-2 border border-gray-300 rounded-lg"
-              value={formData.department}
-              onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+              value={formData.position}
+              onChange={(e) => setFormData({ ...formData, position: e.target.value })}
             />
           </div>
           <button

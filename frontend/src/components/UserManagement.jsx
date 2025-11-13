@@ -8,7 +8,7 @@ function UserManagement() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    department: ''
+    position: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -67,7 +67,7 @@ function UserManagement() {
     setFormData({
       name: user.name,
       email: user.email,
-      department: user.department || ''
+      position: user.position || ''
     });
     setShowForm(true);
   };
@@ -95,7 +95,7 @@ function UserManagement() {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', email: '', department: '' });
+    setFormData({ name: '', email: '', position: '' });
     setEditingUser(null);
     setShowForm(false);
   };
@@ -169,13 +169,13 @@ function UserManagement() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-gray-700 mb-1 font-medium">Department</label>
+              <label className="block text-gray-700 mb-1 font-medium">Position</label>
               <input
                 type="text"
                 className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={formData.department}
-                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                placeholder="e.g., Engineering, Marketing, Finance"
+                value={formData.position}
+                onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                placeholder="e.g., Manager, Engineer, Accountant, Director"
               />
             </div>
           </div>
@@ -220,7 +220,7 @@ function UserManagement() {
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Department</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Position</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">Created</th>
                 <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700">Actions</th>
               </tr>
@@ -244,9 +244,9 @@ function UserManagement() {
                     <p className="text-sm text-gray-700">{user.email}</p>
                   </td>
                   <td className="px-4 py-3">
-                    {user.department ? (
+                    {user.position ? (
                       <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
-                        {user.department}
+                        {user.position}
                       </span>
                     ) : (
                       <span className="text-sm text-gray-400">-</span>

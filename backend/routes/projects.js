@@ -32,8 +32,8 @@ router.get('/user/:userId', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const project = await Project.findById(req.params.id)
-      .populate('userId', 'name email department')
-      .populate('supervisorId', 'name email department');
+      .populate('userId', 'name email position')
+      .populate('supervisorId', 'name email position');
 
     if (!project) {
       return res.status(404).json({ error: 'Project not found' });
