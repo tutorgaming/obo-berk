@@ -7,8 +7,12 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
+# Set NODE_ENV to development to ensure devDependencies are installed
+ENV NODE_ENV=development
+
 # Install dependencies (including devDependencies)
 RUN npm install
+RUN npm install -g nodemon
 
 # Copy application files
 COPY . .
