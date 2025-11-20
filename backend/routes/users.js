@@ -28,7 +28,7 @@ router.get('/:id', async (req, res) => {
 // Create new user
 router.post('/', async (req, res) => {
   try {
-    const { name, email, department } = req.body;
+    const { name, email, position } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ error: 'User with this email already exists' });
     }
 
-    const user = new User({ name, email, department });
+    const user = new User({ name, email, position });
     await user.save();
     res.status(201).json(user);
   } catch (error) {
@@ -47,10 +47,10 @@ router.post('/', async (req, res) => {
 // Update user
 router.put('/:id', async (req, res) => {
   try {
-    const { name, email, department } = req.body;
+    const { name, email, position } = req.body;
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { name, email, department },
+      { name, email, position },
       { new: true, runValidators: true }
     );
 

@@ -111,8 +111,8 @@ router.get('/project/:projectId/pdf', async (req, res) => {
     //   doc.text(`รายละเอียด / Description: ${project.description}`);
     // }
     // doc.text(`เจ้าของโครงการ / Owner: ${project.userId.name} (${project.userId.email})`);
-    // if (project.userId.department) {
-    //   doc.text(`แผนก / Department: ${project.userId.department}`);
+    // if (project.userId.position) {
+    //   doc.text(`ตำแหน่ง / Position: ${project.userId.position}`);
     // }
     //doc.text(`สร้างรายงาน / Generated: ${new Date().toLocaleString('th-TH')}`);
     // doc.moveDown();
