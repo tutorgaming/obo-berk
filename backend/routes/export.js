@@ -38,7 +38,12 @@ router.get('/project/:projectId/pdf', async (req, res) => {
 
     // Set response headers
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename=expenses-${project.name.replace(/\s+/g, '-')}-${Date.now()}.pdf`);
+
+    // Support Thai characters in filename using RFC 5987 encoding
+    const timestamp = Date.now();
+    const fallbackFilename = `expenses-${project.name.replace(/[^\x00-\x7F]/g, '').replace(/\s+/g, '-')}-${timestamp}.pdf`;
+    const utf8Filename = encodeURIComponent(`expenses-${project.name}-${timestamp}.pdf`);
+    res.setHeader('Content-Disposition', `attachment; filename="${fallbackFilename}"; filename*=UTF-8''${utf8Filename}`);
 
     // Pipe PDF to response
     doc.pipe(res);
